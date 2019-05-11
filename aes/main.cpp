@@ -1,9 +1,9 @@
-#include"ase.cpp"
-int main(){
-    w keyword[44];
-    inputkey("1234568798456456",keyword);
-   /* 
-    书上给出的密钥示例
+#include"lib.h"
+#include"aes.cpp"
+int main() {
+	w keyword[44];
+  //  inputkey("1234568798456456",keyword);
+  
     keyword[0].elem[0] = (unsigned char)0x0f;
     keyword[0].elem[1] = (unsigned char)0x15;
     keyword[0].elem[2] = (unsigned char)0x71;
@@ -20,14 +20,15 @@ int main(){
     keyword[3].elem[1] = (unsigned char)0x7f;
     keyword[3].elem[2] = (unsigned char)0x67;
     keyword[3].elem[3] = (unsigned char)0x98;
-    */
+    
     makekeyword(keyword);
-    ase t(keyword);
-    unsigned char b[16];
+    aes t(keyword);
+    unsigned char b[17];
+    b[16] = '\0';
     std::cin>>b;
-    t.jiami(b);
+    t.encryption(b);
     std::cout<<b<<std::endl;
-    t.jiemi(b);
+   t.decrypt(b);
     std::cout<<b<<std::endl;
-
+	return 0;
 }
