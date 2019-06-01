@@ -4,7 +4,7 @@ mblock::mblock(char * buff)
 {
 	strcpy(this->buff, buff);
 	for (int i = 0; i < 80; i++)
-		this->initw(i);
+		this->w[i] = this->initw(i);
 }
 
 uint64_t mblock::initw(int num)
@@ -14,7 +14,7 @@ uint64_t mblock::initw(int num)
 		memcpy(&temp, this->buff + num * 8, 8);
 	else
 		temp = detal(1,initw(num - 2)) + initw(num - 7) + detal(0, initw(num - 15)) + initw(num - 16);
-	return uint64_t();
+	return temp;
 }
 
 uint64_t mblock::getw(int num)

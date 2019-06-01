@@ -84,6 +84,8 @@ hashval SHA512::hash(char* words)
 	for (int i = 0; i < N; i++) {
 		memcpy(block, buf + i * 128, 128);
 		mblock T(block);
+	//	for (int i = 0; i < 80; i++)
+		//	std::cout << T.getw(i) << std::endl;
 		//80 ÂÖ
 		uint64_t rtemp[8];
 		for (int i = 0; i < 8; i++)
@@ -94,7 +96,7 @@ hashval SHA512::hash(char* words)
 		{
 			t1 = this->mState[7] + ch(mState[4], mState[5], mState[6]) + sigma(1, mState[4]) + T.getw(i) + this->const_K[i];
 			t2 = sigma(0, mState[0]) + maj(mState[0], mState[1], mState[2]);
-			tempr = mState[7] = mState[6];
+			mState[7] = mState[6];
 			mState[6] = mState[5];
 			mState[5] = mState[4];
 			mState[4] = mState[3] + t1;

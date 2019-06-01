@@ -6,7 +6,8 @@ int main() {
 	hashval hashbuff;
 	hashbuff = T.hash(t);
 	printhash(hashbuff);
-	hashval h2 = T.hash(t);
+	char t2[] = "1asdfafwafhashfahuidhfiuahsiuvhaiufhiaufhaudhfaosufho4";
+	hashval h2 = T.hash(t2);
 	printhash(h2);
 	return 0;
 }
