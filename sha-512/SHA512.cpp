@@ -120,7 +120,11 @@ SHA512::~SHA512()
 {
 }
 void printhash(hashval t) {
-	for (int i = 0; i < 8; i++)
-		printf("%ul", t.val[i]);
-	printf("\n");
+	std::string shows="";
+	std::bitset<64> t1;
+	for(int i=0;i<8;i++){
+		t1 = t.val[i];
+		shows+= t1.to_string();
+	}
+	std::cout<<shows<<std::endl;
 }
