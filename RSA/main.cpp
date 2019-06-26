@@ -6,13 +6,13 @@ int main(int argc, char const *argv[]){
 	RSA rsa;
 	rsa.CreateKeys();
 	cin>>buffer;
-	encoded_temp = rsa.encrypt(buffer);
-	rsa.decrypt(encoded_temp);
+	// encoded_temp = rsa.encrypt(buffer);
+	// rsa.decrypt(encoded_temp);
 	int *privatekey, *publickey; 
 	privatekey = rsa.GetPrivateKey();
 	publickey = rsa.GetPublicKey();
-	string encoded = rsa.GetEncoded();
-	string decoded = rsa.GetDecoded();
+	// string encoded = rsa.GetEncoded();
+	// string decoded = rsa.GetDecoded();
 	cout<<*privatekey<<' '<<*(privatekey + 1)<<endl;
 	cout<<*publickey<<' '<<*(publickey + 1)<<endl;
 	cout<<decoded<<endl;
