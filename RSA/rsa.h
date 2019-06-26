@@ -13,7 +13,8 @@ using namespace std;
 
 class RSA{
 private:
-	int n, e, d, len, bytes;
+	int n, e, d;
+    int len, bytes;
     string encoded;
 	string decoded;
 public:
@@ -23,6 +24,8 @@ public:
     string GetDecoded();
     int *GetPublicKey();
     int *GetPrivateKey();
+    void SetPublicKey(int n, int e);
+    void SetPrivateKey(int n, int d);
 	int gcd(int a, int b);
 	int jacobi(int a, int n);
 	int modpow(long long a, long long b, int c);
@@ -225,6 +228,7 @@ int *RSA::GetPrivateKey(){
     static int privatekey[2];
     privatekey[0] = this->n;
     privatekey[1] = this->e;
+    // printf("privatekey: n->%d e->%d\n", this->n, this->e);
     return privatekey;
 }
 
@@ -233,8 +237,24 @@ int *RSA::GetPublicKey(){
     static int publickey[2];
     publickey[0] = this->n;
     publickey[1] = this->d;
+    // printf("publickey: n->%d d->%d\n", this->n, this->d);
     return publickey;
 }
 
+void RSA::SetPrivateKey(int n, int e){
+    if(this->n >> 21) this->bytes = 3;
+    else if(this->n >> 14) this->bytes = 2;
+    else this->bytes = 1;
+    this->n = n;
+    this->e = e;
+}
+
+void RSA::SetPublicKey(int n, int d){
+    if(this->n >> 21) this->bytes = 3;
+    else if(this->n >> 14) this->bytes = 2;
+    else this->bytes = 1;
+    this->n = n;
+    this->d = d;
+}
 
 
