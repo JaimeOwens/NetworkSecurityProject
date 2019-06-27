@@ -14,7 +14,8 @@ private:
 public:
 	SHA512();
 	void init();
-	hashval hash(char*);
+	//hashval hash(char*);
+	hashval hash(const char*);
 	~SHA512();
 	/*
 	todo 

@@ -13,6 +13,7 @@ class mblock
 	uint64_t w[80];
 public:
 	mblock(char* buff);
+	mblock();
 	uint64_t initw(int num);
 	uint64_t getw(int num);
 	~mblock();

@@ -66,7 +66,8 @@ void SHA512::init()
 	mState[7] = 0x5be0cd19137e2179;
 }
 
-hashval SHA512::hash(char* words)
+
+hashval SHA512::hash(const char* words)
 {
 	this->init();
 	uint64_t len = strlen(words);

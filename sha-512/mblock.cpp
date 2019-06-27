@@ -1,5 +1,7 @@
 #include "mblock.h"
+mblock::mblock(){
 
+}
 mblock::mblock(char * buff)
 {
 	strcpy(this->buff, buff);
