@@ -8,7 +8,7 @@ mytcp::mytcp(std::string add,int port){
     connect(this->sockfd,(struct sockaddr*)&addr,sizeof(addr));
 }
 int mytcp::mysend(unsigned char* msg,int len){
-    return write(this->socfd,msg,len);
+    return write(this->sockfd,msg,len);
 }
 int mytcp::myrecv(char* msg){
     return recv(this->sockfd,msg,4096,0);
