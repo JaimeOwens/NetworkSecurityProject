@@ -53,6 +53,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	memset(msg, 0, 8 + len + A_len + 386);
 	memcpy(msg, &A_len, 4);
 	memcpy(msg + 4, &len, 4);
+	//std::cout<<"the a_len and b_len is "<<A_len<<" "<<len<<std::endl;
 	memcpy(msg + 8, MSG_A, A_len);
 	memcpy(msg + 8 + A_len, kstemp, len);
 	temphs = t.hash(this->pi.data());
