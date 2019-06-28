@@ -7,10 +7,10 @@ mytcp::mytcp(std::string add,int port){
     addr.sin_addr.s_addr = inet_addr(add.data());
     connect(this->sockfd,(struct sockaddr*)&addr,sizeof(addr));
 }
-int mytcp::mysend(std::string msg){
-    return send(this->sockfd,msg.data(),msg.size(),0);
+int mytcp::mysend(unsigned char* msg,int len){
+    return write(this->socfd,msg,len);
 }
-int mytcp::myrecv(unsigned char* msg,int n){
+int mytcp::myrecv(char* msg){
     return recv(this->sockfd,msg,4096,0);
 }
 mytcp::~mytcp(){

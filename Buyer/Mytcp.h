@@ -16,6 +16,6 @@ class mytcp{
     public:
         mytcp(std::string add,int port);
         ~mytcp();
-        int mysend(std::string msg);
-        int myrecv(unsigned char* msg,int n);
+        int mysend(unsigned char * msg,int len);
+        int myrecv(unsigned char* msg);
 };

@@ -16,7 +16,7 @@ private:
 public:
 	Msg();
 	Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d);
-	unsigned char* makemsg(int a ,int b);
+	unsigned char* makemsg(int a ,int b,int &lens);
 	~Msg();
 };
 

@@ -28,7 +28,7 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 	//now have ds pi oi 
 }
 
-unsigned char* Msg::makemsg(int kbn, int kbe)
+unsigned char* Msg::makemsg(int kbn, int kbe,int &lens)
 {
 	//加密的 PI +DS + OIMD
 	//need ks use rc4
@@ -48,13 +48,13 @@ unsigned char* Msg::makemsg(int kbn, int kbe)
 	rc4 rc;
 	MSG_A[A_len] = '\0';
 	char s[256] = { 0 };
-	std::cout << MSG_A << std::endl;
+	//std::cout << MSG_A << std::endl;
 	rc.rc4_setup((unsigned char *)s, (unsigned char*)this->ks, strlen(this->ks));
 	rc.rc4_encrypt((unsigned char*)s, MSG_A, A_len);
-	std::cout << MSG_A << std::endl;
+	//std::cout << MSG_A << std::endl;
 	//rc.rc4_setup((unsigned char*)s, (unsigned char*)this->ks, strlen(this->ks));
 	//rc.rc4_decrypt((unsigned char*)s, MSG_A, A_len);
-	std::cout << MSG_A << std::endl;
+	//std::cout << MSG_A << std::endl;
 	//rc.rc4_encrypt()
 	//have en MSG_A
 
@@ -64,17 +64,14 @@ unsigned char* Msg::makemsg(int kbn, int kbe)
 	//std::cout << "now is bank kub\n";
 	std::cout << this->ks << "    ks desu"<<std::endl;
 	int* kstemp = kb.encrypt(this->ks);
-	
-	kb.decrypt(kstemp);
-	std::cout << kb.GetDecoded() << std::endl;
-
 	//std::cout << this->ks << std::endl;
 	kb.decrypt(kstemp);
+	std::cout <<kb.GetDecoded() << std::endl;
 	//ks  加密有了
 	// A_len len
 	int len = strlen(this->ks) / kb.GetBytes() * 4;
-	std::cout << len << " len " << A_len<<"     a_len"<<std::endl;
-
+	//std::cout << len << " len " << A_len<<"     a_len"<<std::endl;
+	lens = 8 + len + A_len + 386;
 	unsigned char *msg = new unsigned char[8 + len + A_len + 386+1];
 	
 	memset(msg, 0, 8 + len + A_len + 386);
