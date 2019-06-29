@@ -8,8 +8,8 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 {
 	this->pi = pi;
 	this->oi = oi;
-	this->kr.SetPrivateKey(n, e);
-	this->kr.SetPublicKey(n, d);
+	this->kr.SetPrivateKey(n, d);
+	this->kr.SetPublicKey(n, e);
 	strcpy(this->ks, ks.data());
 	SHA512 t;
 	hashval pimd = t.hash(this->pi.data());
