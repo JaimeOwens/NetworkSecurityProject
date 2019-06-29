@@ -17,6 +17,7 @@ using namespace std;
 
 #define SHORTLENGTH 128
 #define LONGLENGTH 512
+#define START 8
 #define _RECVPORT_ 8886
 #define _SENDPORT_ 8888
 #define _BACKLOG_ 10
@@ -31,84 +32,96 @@ struct check_msg{
 struct all_msg{
 	int lena;
 	int lenb;
-	u_char *buffer;
+	char buffer[2048];
 };
 
 class Merchant{
 private:
-	check_msg *chk_msg;
-	char encrypt_msga[LONGLENGTH];
-	char encrypt_msgb[LONGLENGTH];
+	unsigned char *encrypt_msga;
+	unsigned char *encrypt_msgb;
+	uint64_t PIMD[8];
+	char OI[SHORTLENGTH];
+	int *DS;
+	int CC[2];
 	int sock_recv;
 	int sock_send;
 public:
-	int CheckMessage();
-	int Loader(char *);
-	int Saver(char *, char *, char *);
-	int Checker(char *);
-	int PrepareSend();
+	int StructChecker();
 	int Receiver();
+	// int CheckMessage();
+	int Loader(unsigned char *);
+	// int Checker(char *);
 	int Sender(char *);
 };
 
-int Merchant::Loader(char *buffer){
+int Merchant::Loader(unsigned char *buffer){
 	all_msg *msg = (struct all_msg *)buffer;
-	char *buffer_chk;
-	char *buffer_a;
-	char *buffer_b;
-	memcpy(buffer_a, msg->buffer, msg->lena);
-	memcpy(buffer_b, msg->buffer + msg->lena, msg->lenb);
-	memcpy(buffer_chk, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
-	this->Saver(buffer_chk, buffer_a, buffer_b);
+	this->encrypt_msga = new unsigned char [msg->lena];
+	this->encrypt_msgb = new unsigned char [msg->lenb];
+	memcpy(this->encrypt_msga, msg->buffer, msg->lena);
+	memcpy(this->encrypt_msgb, msg->buffer + msg->lena, msg->lenb);
+	check_msg *chk_msg;
+	memcpy(chk_msg, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
+	memcpy(this->PIMD, chk_msg->PIMD, sizeof(PIMD)); 
+	strcpy(this->OI, chk_msg->OI);
+	memcpy(this->DS, chk_msg->DS, sizeof(chk_msg->DS)); 
+	memcpy(this->CC, chk_msg->CC, sizeof(int)*2);
+	this->StructChecker();
 }
 
-int Merchant::Saver(char *buffer_chk, char *buffer_a, char *buffer_b){
-	this->chk_msg = (struct check_msg *)buffer_chk;
-	strcpy(this->encrypt_msga, buffer_a);
-	strcpy(this->encrypt_msgb, buffer_b);
+int Merchant::StructChecker(){
+	cout<<"MSG_A: "<<this->encrypt_msga<<endl;
+	cout<<"MSG_B: "<<this->encrypt_msgb<<endl;
+	cout<<"PIMD: "<<this->PIMD<<endl;
+	cout<<"OI: "<<this->OI<<endl;
+	cout<<"DS: "<<this->DS<<endl;
+	cout<<"CC: "<<this->CC[0]<<' '<<this->CC[1]<<endl;
 }
 
-int Merchant::Checker(char *buffer){
-	if(!CheckMessage()){
-		sprintf(buffer, "%s", encrypt_msga);
-	}
-	else{
-		sprintf(buffer, "%s", "counterfeit");
-	}
-}
+// int Merchant::Checker(char *buffer){
+// 	if(!CheckMessage()){
+// 		sprintf(buffer, "%s", this->encrypt_msga);
+// 	}
+// 	else{
+// 		sprintf(buffer, "%s", "counterfeit");
+// 	}
+// }
 
-int Merchant::CheckMessage(){
-	RSA rsa;
-	rsa.SetPublicKey(this->chk_msg->CC[0], this->chk_msg->CC[1]);
-	int *buffer;
-	buffer = (int *)&this->chk_msg->DS;
-	rsa.decrypt(buffer);
-	string decoded_temp = rsa.GetDecoded();
-	char decoded[128];
-	strcpy(decoded, decoded_temp.c_str());
+// int Merchant::CheckMessage(){
+// 	RSA rsa;
+// 	rsa.SetPublicKey(this->chk_msg->CC[0], this->chk_msg->CC[1]);
+	
+// 	int *buffer;
+// 	buffer = (int *)&this->chk_msg->DS;
+// 	rsa.decrypt(buffer);
+// 	string decoded_temp = rsa.GetDecoded();
+// 	char decoded[128];
+// 	strcpy(decoded, decoded_temp.c_str());
 
-	SHA512 T;
-	hashval hashbuff;
-	hashbuff = T.hash(this->chk_msg->OI);
-	char OIMD[128];
-	sprintf(OIMD, "%s", hashbuff.val);
+// 	SHA512 T;
+// 	hashval hashbuff;
+// 	hashbuff = T.hash(this->chk_msg->OI);
+// 	char OIMD[128];
+// 	sprintf(OIMD, "%s", hashbuff.val);
 
-	char POMD[128];
-	int len = strlen(this->chk_msg->PIMD) > strlen(OIMD) ? strlen(this->chk_msg->PIMD) : strlen(OIMD);
-	for(int i = 0; i< len; i++){
-		POMD[i] = this->chk_msg->PIMD[i] | OIMD[i];
-	}
-	hashbuff = T.hash(POMD);
-	memset(POMD, 0, sizeof(POMD));
-	sprintf(POMD, "%s", hashbuff.val);
+// 	char POMD[128];
+// 	int len = strlen(this->chk_msg->PIMD) > strlen(OIMD) ? strlen(this->chk_msg->PIMD) : strlen(OIMD);
+// 	for(int i = 0; i< len; i++){
+// 		POMD[i] = this->chk_msg->PIMD[i] | OIMD[i];
+// 	}
+// 	hashbuff = T.hash(POMD);
+// 	memset(POMD, 0, sizeof(POMD));
+// 	sprintf(POMD, "%s", hashbuff.val);
 
-	if(strcmp(decoded,POMD) == 0){
-		return 0;
-	}
-	else{
-		return -1;
-	}
-}
+// 	if(strcmp(decoded,POMD) == 0){
+// 		cout<<"RIGHT"<<endl;
+// 		return 0;
+// 	}
+// 	else{
+// 		cout<<"WRONG"<<endl;
+// 		return -1;
+// 	}
+// }
 
 int Merchant::Receiver(){
 	this->sock_recv = socket(AF_INET,SOCK_STREAM,0);
@@ -149,17 +162,14 @@ int Merchant::Receiver(){
 		if(fd==0) {
 			close(this->sock_recv);
 			printf("port=%d,ip=%s\n",ntohs(socket.sin_port),buf_ip);
-			while(1) {
-				char buf[1024];
-				memset(buf,'\0',sizeof(buf));
-				read(client_sock,buf,sizeof(buf));
-				this->Loader(buf);
-				char buf2[1024];
-				memset(buf2,'\0',sizeof(buf2));
-				this->Checker(buf2);
-				this->Sender(buf2);
-				printf("wait...\n");
-			}
+			unsigned char buf[1024];
+			memset(buf,'\0',sizeof(buf));
+			read(client_sock,buf,sizeof(buf));
+			this->Loader(buf);
+			// char buf2[1024];
+			// memset(buf2, 0,sizeof(buf2));
+			// this->Checker(buf2);
+			// this->Sender(buf2);
 			close(fd);
 		} else if(fd>0) {
 			close(fd);
@@ -167,7 +177,7 @@ int Merchant::Receiver(){
 	}
 }
 
-int Merchant::PrepareSend(){
+int Merchant::Sender(char *buffer){
 	this->sock_send = socket(AF_INET,SOCK_STREAM,0);
 	struct sockaddr_in server_sock;
 	bzero(&server_sock, sizeof(server_sock));
@@ -180,9 +190,6 @@ int Merchant::PrepareSend(){
 		return 1; 
 	}
 	printf("Connect success\n");
-}
-
-int Merchant::Sender(char *buffer){
 	char buff[2048];
 	memset(buff, 0, sizeof(buffer));
 	strcpy(buff, buffer);

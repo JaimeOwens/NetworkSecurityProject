@@ -61,11 +61,16 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	memcpy(msg, &A_len, 4);
 	memcpy(msg + 4, &len, 4);
 	memcpy(msg + 8, MSG_A, A_len);
+	cout<<"MSG_A: "<<MSG_A<<endl;
 	memcpy(msg + 8 + A_len, kstemp, len);
+	cout<<"MSG_B: "<<kstemp<<endl;
 	temphs = t.hash(this->pi.data());
 	memcpy(msg + 8 + A_len + len, &temphs.val, 64);
+	cout<<"PIMD: "<<&temphs.val<<endl;
 	memcpy(msg + 8 + A_len + len + 128, this->oi.data(), 64);
+	cout<<"OI: "<<this->oi<<endl;
 	memcpy(msg + 8 + A_len + len + 256, this->ds, 64);
+	cout<<"DS: "<<this->ds<<endl;
 	memcpy((msg + 8 + A_len + len + 384), this->kr.GetPublicKey(), 8);
 	return msg;
 }
