@@ -29,7 +29,7 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 
 unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 {
-	int A_len = this->pi.size() + 128+1;
+	int A_len = this->pi.size() + 128;
 	unsigned char* MSG_A = new unsigned char[this->pi.size() + 128 + 1];
 	
 	memset(MSG_A, 0, A_len );

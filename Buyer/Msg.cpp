@@ -33,7 +33,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int &lens)
 	//¼ÓÃÜµÄ PI +DS + OIMD
 	//need ks use rc4
 	
-	int A_len = this->pi.size() + 128+1;
+	int A_len = this->pi.size() + 128;
 	unsigned char* MSG_A = new unsigned char[this->pi.size() + 128 + 1];
 	memset(MSG_A, 0, A_len );
 	memcpy(MSG_A, this->pi.data(), this->pi.size());
