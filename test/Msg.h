@@ -9,7 +9,8 @@ private:
 	std::string pi;
 	std::string oi;
 	char ks[4096];
-	int ds[16];
+	int* ds;
+	int dslen;
 	RSA kr;
 public:
 	Msg();
