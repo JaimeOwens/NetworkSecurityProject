@@ -8,8 +8,8 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 {
 	this->pi = pi;
 	this->oi = oi;
-	this->kr.SetPrivateKey(n, e);
-	this->kr.SetPublicKey(n, d);
+	this->kr.SetPrivateKey(n, d);
+	this->kr.SetPublicKey(n, e);
 	//this->ks = new char[ks.size() + 1];
 	strcpy(this->ks, ks.data());
 	SHA512 t;
@@ -30,7 +30,7 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 
 unsigned char* Msg::makemsg(int kbn, int kbe,int &lens)
 {
-	//加密的 PI +DS + OIMD
+	//录脫脙脺碌脛 PI +DS + OIMD
 	//need ks use rc4
 	
 	int A_len = this->pi.size() + 128+1;
@@ -67,7 +67,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int &lens)
 	//std::cout << this->ks << std::endl;
 	kb.decrypt(kstemp);
 	std::cout <<kb.GetDecoded() << std::endl;
-	//ks  加密有了
+	//ks  录脫脙脺脫脨脕脣
 	// A_len len
 	int len = strlen(this->ks) / kb.GetBytes() * 4;
 	//std::cout << len << " len " << A_len<<"     a_len"<<std::endl;

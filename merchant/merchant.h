@@ -17,8 +17,8 @@ using namespace std;
 
 #define SHORTLENGTH 128
 #define LONGLENGTH 512
-#define _RECVPORT_ 6000
-#define _SENDPORT_ 7000
+#define _RECVPORT_ 8886
+#define _SENDPORT_ 8888
 #define _BACKLOG_ 10
 
 struct check_msg{
@@ -48,7 +48,7 @@ public:
 	int Checker(char *);
 	int PrepareSend();
 	int Receiver();
-	int Sender();
+	int Sender(char *);
 };
 
 int Merchant::Loader(char *buffer){
@@ -58,7 +58,7 @@ int Merchant::Loader(char *buffer){
 	char *buffer_b;
 	memcpy(buffer_a, msg->buffer, msg->lena);
 	memcpy(buffer_b, msg->buffer + msg->lena, msg->lenb);
-	memcpy(buffer_chk, msg->buffer + msg->lena + msg_lenb, sizeof(check_msg));
+	memcpy(buffer_chk, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
 	this->Saver(buffer_chk, buffer_a, buffer_b);
 }
 
@@ -79,24 +79,24 @@ int Merchant::Checker(char *buffer){
 
 int Merchant::CheckMessage(){
 	RSA rsa;
-	KUc = this->chk_msg.CC;
-	rsa.SetPublicKey(KUc[0], KUc[1]);
+	rsa.SetPublicKey(this->chk_msg->CC[0], this->chk_msg->CC[1]);
 	int *buffer;
-	buffer = (int *)&this->chk_msg.DS;
+	buffer = (int *)&this->chk_msg->DS;
 	rsa.decrypt(buffer);
 	string decoded_temp = rsa.GetDecoded();
-	char decoded[128] = decoded_temp.c_str();
+	char decoded[128];
+	strcpy(decoded, decoded_temp.c_str());
 
 	SHA512 T;
 	hashval hashbuff;
-	hashbuff = T.hash(this->OI);
+	hashbuff = T.hash(this->chk_msg->OI);
 	char OIMD[128];
 	sprintf(OIMD, "%s", hashbuff.val);
 
 	char POMD[128];
-	int len = strlen(PIMD) > strlen(OIMD) ? strlen(PIMD) : strlen(OIMD);
+	int len = strlen(this->chk_msg->PIMD) > strlen(OIMD) ? strlen(this->chk_msg->PIMD) : strlen(OIMD);
 	for(int i = 0; i< len; i++){
-		POMD[i] = PIMD[i] | OIMD[i];
+		POMD[i] = this->chk_msg->PIMD[i] | OIMD[i];
 	}
 	hashbuff = T.hash(POMD);
 	memset(POMD, 0, sizeof(POMD));
@@ -112,7 +112,7 @@ int Merchant::CheckMessage(){
 
 int Merchant::Receiver(){
 	this->sock_recv = socket(AF_INET,SOCK_STREAM,0);
-	if(sock<0) {
+	if(this->sock_recv<0) {
 		printf("socket()\n");
 	}
 	struct sockaddr_in server_socket;
