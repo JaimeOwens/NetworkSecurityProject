@@ -261,4 +261,13 @@ int RSA::GetCount(){
     return this->count;
 }
 
-
+int RSA::GetLength(int *encoded){
+    int count = 0;
+    int *p = encoded;
+    while(*p != 0){
+        p ++;
+        count ++;
+    } 
+    int len = count * sizeof(int);
+    return len;
+}

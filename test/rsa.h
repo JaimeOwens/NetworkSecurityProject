@@ -21,6 +21,7 @@ private:
 public:
     RSA();
 	void CreateKeys();
+	int GetLength(int *);
     int GetCount();
     int GetBytes();
     string GetEncoded();
