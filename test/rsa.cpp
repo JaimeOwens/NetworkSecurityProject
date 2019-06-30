@@ -1,5 +1,4 @@
 #include"rsa.h"
-
 RSA::RSA(){
     this->len = 0;
 }
@@ -17,7 +16,7 @@ int RSA::modpow(long long a, long long b, int c) {
 }
 
 int RSA::jacobi(int a, int n){
-	int twos, temp;
+    int twos, temp;
     int mult = 1;
     while(a > 1 && a != n) {
         a = a % n;
@@ -37,14 +36,14 @@ int RSA::jacobi(int a, int n){
 }
 
 int RSA::solovayPrime(int a,int n){
-	int x = jacobi(a, n);
+    int x = jacobi(a, n);
     if(x == -1) x = n - 1;
     return x != 0 && modpow(a, (n - 1)/2, n) == x;
 }
 
 int RSA::probablePrime(int n, int k){
-	if(n == 2) return 1;
-	else if(n % 2 == 0 || n == 1) return 0;
+    if(n == 2) return 1;
+    else if(n % 2 == 0 || n == 1) return 0;
     while(k-- > 0) {
         if(!solovayPrime(rand() % (n - 2) + 2, n)) return 0;
     }
@@ -52,7 +51,7 @@ int RSA::probablePrime(int n, int k){
 }
 
 int RSA::randPrime(int n){
-	int prime = rand() % n;
+    int prime = rand() % n;
     n += n % 2; 
     prime += 1 - prime % 2;
     while(1) {
@@ -81,7 +80,7 @@ int RSA::randExponent(int phi, int n) {
 }
 
 int RSA::inverse(int n, int modulus){
-	int a = n, b = modulus;
+    int a = n, b = modulus;
     int x = 0, y = 1, x0 = 1, y0 = 0, q, temp;
     while(b != 0) {
         q = a / b;
@@ -129,7 +128,7 @@ void RSA::CreateKeys(){
 }
 
 int RSA::encode(int m, int e, int n){
-	return modpow(m, e, n);
+    return modpow(m, e, n);
 }
 
 int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int modulus) {
@@ -145,6 +144,7 @@ int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int mod
         // printf("%d ", encoded[i/bytes]);
     }
     // cout<<endl;
+	 this->count = count;
     int *p = encoded;
     int *encoded2 = (int *)malloc(sizeof(int) * count);
     int *q = encoded2;
@@ -156,7 +156,7 @@ int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int mod
     if(strlen(message)%BYTES == 3 ||strlen(message)%BYTES == 0)
         *q = NULL;
     // cout<<endl; 
-    this->count = count;
+   
     // cout<<"bytes1: "<<this->bytes<<endl;
     // cout<<"count1: "<<this->count<<endl;
     // cout<<"len1: "<<this->len<<endl;
@@ -224,7 +224,7 @@ int *RSA::GetPrivateKey(){
     static int privatekey[2];
     privatekey[0] = this->n;
     privatekey[1] = this->d;
-    printf("privatekey: n->%d d->%d\n", this->n, this->d);
+  //  printf("privatekey: n->%d d->%d\n", this->n, this->d);
     return privatekey;
 }
 
@@ -233,7 +233,7 @@ int *RSA::GetPublicKey(){
     static int publickey[2];
     publickey[0] = this->n;
     publickey[1] = this->e;
-    printf("publickey: n->%d e->%d\n", this->n, this->e);
+ //   printf("publickey: n->%d e->%d\n", this->n, this->e);
     return publickey;
 }
 
@@ -260,3 +260,5 @@ int RSA::GetBytes(){
 int RSA::GetCount(){
     return this->count;
 }
+
+

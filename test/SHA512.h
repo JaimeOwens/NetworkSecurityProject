@@ -10,7 +10,9 @@
 
 std::string sha512(const void* dat, size_t len);
 std::string sha512(std::string input);
-void block(std::string sha,uint64_t *s);
+std::string sha512file(std::FILE* file);
+std::string sha512file(const char* filename);
+void block(std::string a,uint64_t * s);
 
 class SHA512 {
 

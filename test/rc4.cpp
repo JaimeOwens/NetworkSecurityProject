@@ -32,7 +32,7 @@ void rc4::rc4_encrypt( unsigned char *s, unsigned char *data, int length )
     int i = 0, j = 0, t = 0, k;
     unsigned char tmp;
 
-    cout<<"edata  : "<<data<<endl;
+  //  cout<<"edata  : "<<data<<endl;
     for( k = 0; k < length; k++ ) 
     {
         i = (i + 1)%256;
@@ -51,7 +51,7 @@ void rc4::rc4_decrypt( unsigned char *s, unsigned char *data, int length )
     int i = 0, j = 0, t = 0, k;
     unsigned char tmp;
 
-    cout<<"edata  : "<<data<<endl;
+ //   cout<<"edata  : "<<data<<endl;
     for( k = 0; k < length; k++ ) 
     {
         i = (i + 1)%256;

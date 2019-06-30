@@ -44,5 +44,3 @@ public:
     int *encrypt(char *buffer);
     void decrypt(int *encoded);
 };
-
-

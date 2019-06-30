@@ -146,6 +146,7 @@ int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int mod
     // cout<<endl;
     int *p = encoded;
     int *encoded2 = (int *)malloc(sizeof(int) * count);
+      this->count = count;
     int *q = encoded2;
     while(count--){
         // cout<<*p<<' ';
@@ -155,7 +156,7 @@ int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int mod
     if(strlen(message)%BYTES == 3 ||strlen(message)%BYTES == 0)
         *q = NULL;
     // cout<<endl; 
-    this->count = count;
+  
     // cout<<"bytes1: "<<this->bytes<<endl;
     // cout<<"count1: "<<this->count<<endl;
     // cout<<"len1: "<<this->len<<endl;

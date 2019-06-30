@@ -8,14 +8,17 @@ int main() {
 	unsigned char* temp = NULL;
 	int lens;
 	temp = m.makemsg(1823347, 549,lens);
-	int a=5, b=6;
+	int a=5, b=6,c=5;
 	if (temp != NULL) {
-		memcpy(&a, temp, 4);
-		memcpy(&b, temp + 4, 4);
+		memcpy(&a, temp+lens-8, 4);
+		memcpy(&b, temp +lens-4, 4);
 	}
-	std::cout << a << " " << b << std::endl;
+	std::cout << a << " " << b <<" "<<c<<std::endl;
+	std::cout<<(char*)(temp+12)<<std::endl;
+	int * te = new int[c];
+	//memcpy(temp+12+)
 	mytcp se("127.0.0.1",8886);
-	se.mysend(temp,lens);
+	std::cout<<se.mysend(temp,lens);
 	//int * key = new int[b/4];
 //	memcpy(temp+8+a,key,b);
 	return 0;
