@@ -57,7 +57,8 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	
 	memcpy(msg, &A_len, 4);//len a
 	memcpy(msg + 4, &len, 4);//len b
-	memcpy(msg + 8,&(this->dslen),4);//len ds
+	memcpy(msg + 8, &(this->dslen), 4);//len ds
+	cout<<A_len<<' '<<len<<' '<<this->dslen<<endl;
 	//std::cout<<"the a_len and b_len is "<<A_len<<" "<<len<<std::endl;
 	memcpy(msg + 12, MSG_A, A_len);
 	memcpy(msg + 12 + A_len, kstemp, len);
@@ -66,6 +67,12 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	memcpy(msg + 12 + A_len + len + 128, this->oi.data(), 64);
 	memcpy(msg + 12 + A_len + len + 256, this->ds, this->dslen);
 	memcpy((msg + 12 + A_len + len + 512), this->kr.GetPublicKey(), 8);
+	cout<<endl;
+	cout<<"MSG_A: "<<MSG_A<<endl;
+	cout<<"MSG_B: "<<kstemp<<endl;
+	cout<<"PIMD: "<<temphs.data()<<endl;
+	cout<<"OI: "<<this->oi.data()<<endl;
+	cout<<"DS: "<<this->ds<<endl;
 	return msg;
 }
 Msg::~Msg()
