@@ -20,7 +20,8 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 	  unsigned short tds[32];
     memcpy(tds,pomd.data(),64);
     int * tempds = this->kr.encrypt((char*)tds);
-	this->dslen = kr.GetCount()*sizeof(int);
+         this->dslen = this->kr.GetLength();
+	//this->dslen = kr.GetCount()*sizeof(int);
 	this->ds = new int[this->dslen];
 	//std::cout<<"dslen "<<this->dslen<<std::endl;
 	memcpy(this->ds,tempds,dslen);
