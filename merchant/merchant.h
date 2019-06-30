@@ -16,7 +16,7 @@
 using namespace std;
 
 #define SHORTLENGTH 128
-#define LONGLENGTH 512
+#define LONGLENGTH 256
 #define START 8
 #define _RECVPORT_ 8886
 #define _SENDPORT_ 8888
@@ -25,13 +25,14 @@ using namespace std;
 struct check_msg{
 	char PIMD[SHORTLENGTH];
 	char OI[SHORTLENGTH];
-	char DS[SHORTLENGTH];
+	char DS[LONGLENGTH];
 	int CC[2];
 };
 
 struct all_msg{
 	int lena;
 	int lenb;
+	int lends;
 	char buffer[2048];
 };
 
@@ -50,32 +51,39 @@ public:
 	int Receiver();
 	// int CheckMessage();
 	int Loader(unsigned char *);
+	int Transformer(struct check_msg *, int);
 	// int Checker(char *);
 	int Sender(char *);
 };
 
 int Merchant::Loader(unsigned char *buffer){
+	check_msg *chk_msg;
 	all_msg *msg = (struct all_msg *)buffer;
 	this->encrypt_msga = new unsigned char [msg->lena];
 	this->encrypt_msgb = new unsigned char [msg->lenb];
+	this->DS = new int [msg->lends];
 	memcpy(this->encrypt_msga, msg->buffer, msg->lena);
 	memcpy(this->encrypt_msgb, msg->buffer + msg->lena, msg->lenb);
-	check_msg *chk_msg;
-	memcpy(chk_msg, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
-	memcpy(this->PIMD, chk_msg->PIMD, sizeof(PIMD)); 
-	strcpy(this->OI, chk_msg->OI);
-	memcpy(this->DS, chk_msg->DS, sizeof(chk_msg->DS)); 
-	memcpy(this->CC, chk_msg->CC, sizeof(int)*2);
+	memcpy(chk_msg, msg->buffer + msg->lena + msg->lenb + msg->lends, sizeof(check_msg));
+	this->Transformer(chk_msg, msg->lends);
 	this->StructChecker();
+}
+
+int Merchant::Transformer(struct check_msg *chk_msg, int dslen){
+	memcpy(this->PIMD, chk_msg->PIMD, sizeof(uint64_t)*8); 
+	
+	strcpy(this->OI, chk_msg->OI);
+	memcpy(this->DS, chk_msg->DS, dslen); 
+	memcpy(this->CC, chk_msg->CC, sizeof(int)*2);
 }
 
 int Merchant::StructChecker(){
 	cout<<"MSG_A: "<<this->encrypt_msga<<endl;
 	cout<<"MSG_B: "<<this->encrypt_msgb<<endl;
-	cout<<"PIMD: "<<this->PIMD<<endl;
-	cout<<"OI: "<<this->OI<<endl;
-	cout<<"DS: "<<this->DS<<endl;
-	cout<<"CC: "<<this->CC[0]<<' '<<this->CC[1]<<endl;
+	// cout<<"PIMD: "<<this->PIMD<<endl;
+	// cout<<"OI: "<<this->OI<<endl;
+	// cout<<"DS: "<<this->DS<<endl;
+	// cout<<"CC: "<<this->CC[0]<<' '<<this->CC[1]<<endl;
 }
 
 // int Merchant::Checker(char *buffer){
