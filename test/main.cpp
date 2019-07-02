@@ -46,5 +46,7 @@ int main() {
 	ts.decrypt(msgb);
 	std::string ksstr = ts.GetDecoded();
 	std::cout<<"ks is   "<<ksstr<<std::endl;
+	mytcp se("127.0.0.1",8886);
+	std::cout<<se.mysend(temp,lens);
 	return 0;
 }
