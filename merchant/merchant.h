@@ -60,12 +60,17 @@ public:
 int Merchant::Transformer(int dslen, struct check_msg chk_msg){
 	char temp[SHORTLENGTH];
 	memcpy(temp, chk_msg.PIMD, strlen(chk_msg.PIMD)); 
-	cout<<"PIMD(content): "<<temp<<endl;
+	cout<<"PIMD(content): "<<chk_msg.PIMD<<endl;
+	cout<<"PIMD(length): "<<strlen(chk_msg.PIMD)<<endl;
 	memcpy(this->PIMD, chk_msg.PIMD, strlen(chk_msg.PIMD)); 
-	memcpy(this->PIMD, chk_msg.PIMD, 64); 
 	strcpy(this->OI, chk_msg.OI);
 	memcpy(this->DS, chk_msg.DS, dslen); 
 	memcpy(this->CC, chk_msg.CC, sizeof(int)*2);
+	int *p = this->DS;
+    while(*p != 0){
+        cout<<*p<<endl;
+        p ++;
+    }
 }
 
 int Merchant::StructChecker(){
@@ -84,7 +89,7 @@ int Merchant::Loader(unsigned char *buffer){
 	cout<<msg->lena<<' '<<msg->lenb<<' '<<msg->lends<<endl;
 	this->encrypt_msga = new unsigned char [msg->lena];
 	this->encrypt_msgb = new unsigned char [msg->lenb];
-	this->DS = (int *)malloc(msg->lends);
+	this->DS = (int *)malloc(msg->lends + 1);
 	memcpy(this->encrypt_msga, msg->buffer, msg->lena);
 	memcpy(this->encrypt_msgb, msg->buffer + msg->lena, msg->lenb);
 	memcpy(msg_p, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));

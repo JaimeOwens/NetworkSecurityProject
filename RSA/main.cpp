@@ -15,6 +15,9 @@ int main(int argc, char const *argv[]){
 	char buffer[4096];
 	while(cin>>buffer){
 		RSA rsa, rsa2;
+		rsa.CreateKeys();
+		rsa.GetPublicKey();
+		rsa.GetPrivateKey();
 		rsa.SetPublicKey(1823347, 549);
 		rsa2.SetPrivateKey(1823347, 990349);
 		int *encoded_temp = rsa.encrypt(buffer);

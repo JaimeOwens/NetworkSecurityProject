@@ -1,4 +1,5 @@
 #include"rsa.h"
+
 RSA::RSA(){
     this->len = 0;
 }
@@ -144,9 +145,9 @@ int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int mod
         // printf("%d ", encoded[i/bytes]);
     }
     // cout<<endl;
-	 this->count = count;
     int *p = encoded;
     int *encoded2 = (int *)malloc(sizeof(int) * count);
+    this->count = count;
     int *q = encoded2;
     while(count--){
         // cout<<*p<<' ';
@@ -156,7 +157,6 @@ int *RSA::encodeMessage(int len, int bytes, char* message, int exponent, int mod
     if(strlen(message)%BYTES == 3 ||strlen(message)%BYTES == 0)
         *q = NULL;
     // cout<<endl; 
-   
     // cout<<"bytes1: "<<this->bytes<<endl;
     // cout<<"count1: "<<this->count<<endl;
     // cout<<"len1: "<<this->len<<endl;
@@ -199,7 +199,7 @@ void RSA::decrypt(int *encoded){
     int flag = 0;
     int *p = encoded;
     while(*p != 0){
-        // cout<<*p<<' ';
+        cout<<*p<<endl;
         p ++;
         count ++;
     }
@@ -224,7 +224,7 @@ int *RSA::GetPrivateKey(){
     static int privatekey[2];
     privatekey[0] = this->n;
     privatekey[1] = this->d;
-  //  printf("privatekey: n->%d d->%d\n", this->n, this->d);
+    printf("privatekey: n->%d d->%d\n", this->n, this->d);
     return privatekey;
 }
 
@@ -233,7 +233,7 @@ int *RSA::GetPublicKey(){
     static int publickey[2];
     publickey[0] = this->n;
     publickey[1] = this->e;
- //   printf("publickey: n->%d e->%d\n", this->n, this->e);
+    printf("publickey: n->%d e->%d\n", this->n, this->e);
     return publickey;
 }
 
@@ -243,6 +243,7 @@ void RSA::SetPrivateKey(int n, int d){
     else this->bytes = 1;
     this->n = n;
     this->d = d;
+    // printf("privatekey: n->%d d->%d\n", this->n, this->d);
 }
 
 void RSA::SetPublicKey(int n, int e){
@@ -251,6 +252,7 @@ void RSA::SetPublicKey(int n, int e){
     else this->bytes = 1;
     this->n = n;
     this->e = e;
+     // printf("publickey: n->%d e->%d\n", this->n, this->e);
 }
 
 int RSA::GetBytes(){
@@ -265,6 +267,7 @@ int RSA::GetLength(int *encoded){
     int count = 0;
     int *p = encoded;
     while(*p != 0){
+        cout<<*p<<endl;
         p ++;
         count ++;
     } 

@@ -52,9 +52,9 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	RSA kb;
 	kb.SetPublicKey(kbn, kbe);
 	int* kstemp = kb.encrypt(this->ks);
-	kb.decrypt(kstemp);
-	std::cout<<"de is ready\n";
-	int len = kb.GetCount()*sizeof(int);
+	// kb.decrypt(kstemp);
+	// std::cout<<"de is ready\n";
+	int len = kb.GetLength(kstemp);
 	lens = 12+len+A_len+520;
 
 	unsigned char *msg = new unsigned char[lens+1];
@@ -71,13 +71,15 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	temphs = sha512(this->pi.data());
 	memcpy(msg + 12 + A_len + len, temphs.data(), temphs.size());
 	memcpy(msg + 12 + A_len + len + MIDLENGTH, this->oi.data(), 64);
-	memcpy(msg + 12 + A_len + len + SHORTLENGTH + MIDLENGTH, this->ds, this->dslen);
+	memcpy(msg + 12 + A_len + len + SHORTLENGTH + MIDLENGTH, this->ds, this->dslen + sizeof(int));
 	memcpy((msg + 12 + A_len + len + SHORTLENGTH + MIDLENGTH + LONGLENGTH), this->kr.GetPublicKey(), 8);
 	cout<<endl;
 	cout<<"MSG_A: "<<MSG_A<<endl;
 	cout<<"MSG_B: "<<kstemp<<endl;
 	cout<<"PIMD: "<<temphs.data()<<endl;
 	cout<<"OI: "<<this->oi.data()<<endl;
+	cout<<"PIMD(length): "<<temphs.size()<<endl;
+	cout<<"DS(length): "<<this->dslen<<endl;
 	cout<<"DS: "<<this->ds<<endl;
 	return msg;
 }

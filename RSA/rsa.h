@@ -245,7 +245,7 @@ void RSA::decrypt(int *encoded){
     int flag = 0;
     int *p = encoded;
     while(*p != 0){
-        // cout<<*p<<' ';
+        cout<<*p<<endl;
         p ++;
         count ++;
     }
@@ -289,6 +289,7 @@ void RSA::SetPrivateKey(int n, int d){
     else this->bytes = 1;
     this->n = n;
     this->d = d;
+    // printf("privatekey: n->%d d->%d\n", this->n, this->d);
 }
 
 void RSA::SetPublicKey(int n, int e){
@@ -297,6 +298,7 @@ void RSA::SetPublicKey(int n, int e){
     else this->bytes = 1;
     this->n = n;
     this->e = e;
+     // printf("publickey: n->%d e->%d\n", this->n, this->e);
 }
 
 int RSA::GetBytes(){
