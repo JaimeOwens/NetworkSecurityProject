@@ -57,6 +57,10 @@ public:
 };
 
 int Merchant::Transformer(int dslen, struct check_msg chk_msg){
+	char temp[SHORTLENGTH];
+	memcpy(temp, chk_msg.PIMD, strlen(chk_msg.PIMD)-6); 
+	cout<<"PIMD(content): "<<temp<<endl;
+	memcpy(this->PIMD, chk_msg.PIMD, strlen(chk_msg.PIMD)-1); 
 	memcpy(this->PIMD, chk_msg.PIMD, 64); 
 	strcpy(this->OI, chk_msg.OI);
 	memcpy(this->DS, chk_msg.DS, dslen); 
