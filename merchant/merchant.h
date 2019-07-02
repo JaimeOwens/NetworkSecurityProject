@@ -16,14 +16,15 @@
 using namespace std;
 
 #define SHORTLENGTH 128
-#define LONGLENGTH 256
+#define MIDLENGTH 256
+#define LONGLENGTH 512
 #define START 8
 #define _RECVPORT_ 8886
 #define _SENDPORT_ 8888
 #define _BACKLOG_ 10
 
 struct check_msg{
-	char PIMD[SHORTLENGTH];
+	char PIMD[MIDLENGTH];
 	char OI[SHORTLENGTH];
 	char DS[LONGLENGTH];
 	int CC[2];
@@ -58,9 +59,9 @@ public:
 
 int Merchant::Transformer(int dslen, struct check_msg chk_msg){
 	char temp[SHORTLENGTH];
-	memcpy(temp, chk_msg.PIMD, strlen(chk_msg.PIMD)-6); 
+	memcpy(temp, chk_msg.PIMD, strlen(chk_msg.PIMD)); 
 	cout<<"PIMD(content): "<<temp<<endl;
-	memcpy(this->PIMD, chk_msg.PIMD, strlen(chk_msg.PIMD)-1); 
+	memcpy(this->PIMD, chk_msg.PIMD, strlen(chk_msg.PIMD)); 
 	memcpy(this->PIMD, chk_msg.PIMD, 64); 
 	strcpy(this->OI, chk_msg.OI);
 	memcpy(this->DS, chk_msg.DS, dslen); 

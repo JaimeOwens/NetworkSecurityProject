@@ -1,4 +1,7 @@
 #include "Msg.h"
+#define SHORTLENGTH 128
+#define MIDLENGTH 256
+#define LONGLENGTH 512
 Msg::Msg()
 {
 
@@ -20,7 +23,7 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 	  unsigned short tds[32];
     memcpy(tds,pomd.data(),64);
     int * tempds = this->kr.encrypt((char*)tds);
-         this->dslen = this->kr.GetLength();
+    this->dslen = this->kr.GetLength(tempds);
 	//this->dslen = kr.GetCount()*sizeof(int);
 	this->ds = new int[this->dslen];
 	//std::cout<<"dslen "<<this->dslen<<std::endl;
@@ -66,10 +69,10 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	memcpy(msg + 12, MSG_A, A_len);
 	memcpy(msg + 12 + A_len, kstemp, len);
 	temphs = sha512(this->pi.data());
-	memcpy(msg + 12 + A_len + len, temphs.data(), 64);
-	memcpy(msg + 12 + A_len + len + 128, this->oi.data(), 64);
-	memcpy(msg + 12 + A_len + len + 256, this->ds, this->dslen);
-	memcpy((msg + 12 + A_len + len + 512), this->kr.GetPublicKey(), 8);
+	memcpy(msg + 12 + A_len + len, temphs.data(), temphs.size());
+	memcpy(msg + 12 + A_len + len + MIDLENGTH, this->oi.data(), 64);
+	memcpy(msg + 12 + A_len + len + SHORTLENGTH + MIDLENGTH, this->ds, this->dslen);
+	memcpy((msg + 12 + A_len + len + SHORTLENGTH + MIDLENGTH + LONGLENGTH), this->kr.GetPublicKey(), 8);
 	cout<<endl;
 	cout<<"MSG_A: "<<MSG_A<<endl;
 	cout<<"MSG_B: "<<kstemp<<endl;
