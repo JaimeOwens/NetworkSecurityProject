@@ -89,7 +89,7 @@ int Merchant::Loader(unsigned char *buffer){
 	cout<<msg->lena<<' '<<msg->lenb<<' '<<msg->lends<<endl;
 	this->encrypt_msga = new unsigned char [msg->lena];
 	this->encrypt_msgb = new unsigned char [msg->lenb];
-	this->DS = (int *)malloc(msg->lends + 1);
+	this->DS = (int *)malloc(msg->lends);
 	memcpy(this->encrypt_msga, msg->buffer, msg->lena);
 	memcpy(this->encrypt_msgb, msg->buffer + msg->lena, msg->lenb);
 	memcpy(msg_p, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
@@ -183,7 +183,7 @@ int Merchant::Receiver(){
 		if(fd==0) {
 			close(this->sock_recv);
 			printf("port=%d,ip=%s\n",ntohs(socket.sin_port),buf_ip);
-			unsigned char buf[1024];
+			unsigned char buf[2048];
 			memset(buf,'\0',sizeof(buf));
 			read(client_sock,buf,sizeof(buf));
 			this->Loader(buf);
