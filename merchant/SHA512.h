@@ -233,32 +233,6 @@ std::string sha512(std::string input){
 	return sha512((const unsigned char*)input.c_str(), (size_t)input.length());
 }
 
-std::string sha512file(std::FILE* file){
-	unsigned char digest[SHA512::DIGEST_SIZE];
-    memset(digest,0,SHA512::DIGEST_SIZE);
-    SHA512 ctx = SHA512();
-    ctx.init();
-
-	char buff[BUFSIZ];
-	size_t len = 0;
-	while( ( len = std::fread(buff ,sizeof(char), BUFSIZ, file) ) > 0) {
-		ctx.update((const unsigned char*)buff, len);
-	}   
-    ctx.final(digest);
- 
-    char buf[2*SHA512::DIGEST_SIZE+1];
-    buf[2*SHA512::DIGEST_SIZE] = 0;
-    for (int i = 0; i < SHA512::DIGEST_SIZE; i++)
-        sprintf(buf+i*2, "%02x", digest[i]);
-    return std::string(buf);
-}
-
-std::string sha512file(const char* filename){
-	std::FILE* file = std::fopen(filename, "rb");
-	std::string res = sha512file(file);
-	std::fclose(file);
-	return res;
-}
 void block(std::string sha,uint64_t *s){
     memcpy(s,sha.data(),64);
 }
