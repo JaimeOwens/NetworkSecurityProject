@@ -17,7 +17,7 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 		temp[i] = pimd[i]|oimd[i];
 	}
 	std::string pomd = sha512(temp,128);
-	  unsigned short tds[64];
+	unsigned short tds[64];
     memcpy(tds,pomd.data(),128);
 	this->ds = this->kr.encrypt((char*)tds);
 	this->dslen = this->kr.GetLength(this->ds);
@@ -56,12 +56,11 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	memcpy(msg + 12, MSG_A, A_len);//msg_a 
 	memcpy(msg + 12 + A_len, kstemp, len);//ks
 	std::string ttemphs = sha512(this->pi.data());
-	memcpy(msg + 12 + A_len + len, ttemphs.c_str(), 128);//pimd
+	memcpy(msg + 12 + A_len + len, ttemphs.c_str(), ttemphs.size());//pimd
 	memcpy(msg + 12 + A_len + len + 128, this->oi.data(), this->oi.size());//oi 
 	msg[12+A_len+len+128+this->oi.size()]='\0';
 	memcpy(msg + 12 + A_len + len + 256, this->ds, this->dslen);//DS 512
-
-	memcpy((msg + 12 + A_len + len +768 ), this->kr.GetPublicKey(), 8);
+	memcpy(msg + 12 + A_len + len + 768, this->kr.GetPublicKey(), 8);
 	return msg;
 }
 Msg::~Msg()

@@ -24,7 +24,7 @@ using namespace std;
 #define _BACKLOG_ 10
 
 struct check_msg{
-	char PIMD[MIDLENGTH];
+	char PIMD[SHORTLENGTH];
 	char OI[SHORTLENGTH];
 	char DS[LONGLENGTH];
 	int CC[2];
