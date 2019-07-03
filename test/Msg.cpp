@@ -7,25 +7,40 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 {
 	this->pi = pi;
 	this->oi = oi;
-	this->kr.SetPrivateKey(n, d);
-	this->kr.SetPublicKey(n, e);
+	// this->kr.SetPrivateKey(n, d);
+	// this->kr.SetPublicKey(n, e);
 	strcpy(this->ks, ks.data());
 	std::string pimd = sha512(pi);
     std::string oimd = sha512(oi);
+    cout<<"PIMD: "<<pimd<<endl;
+    cout<<"OIMD: "<<oimd<<endl;
 	char temp[128];
 	for (int i = 0; i < 128; i++) {
 		temp[i] = pimd[i]|oimd[i];
 	}
 	std::string pomd = sha512(temp,128);
+	cout<<"POMD: "<<pomd<<endl;
 	unsigned short tds[64];
     memcpy(tds,pomd.data(),128);
+	for(int i = 0;i<64;i++)
+		{
+			if((i+1)%4==0)
+				std::cout<<tds[i]<<std::endl;
+			else
+			{
+				std::cout<<tds[i]<<" ";
+			}
+			
+		}
+	this->kr.SetPublicKey(n, d);
+	this->kr.SetPrivateKey(n, e);
 	this->ds = this->kr.encrypt((char*)tds);
 	this->dslen = this->kr.GetLength(this->ds);
 	//this->ds = new int[this->dslen/4];
 	//memcpy(this->ds,tempds,dslen);
 }
 
-unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
+unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 {
 	int A_len = this->pi.size() + 64 + this->dslen;
 	unsigned char* MSG_A = new unsigned char[this->pi.size() + 64 +this->dslen + 1];
@@ -44,7 +59,6 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	RSA kb;
 	kb.SetPublicKey(kbn, kbe);
 	int* kstemp = kb.encrypt(this->ks);
-	
 	int len = kb.GetLength(kstemp);
 	lens = 12+len+A_len+768+8;
 	unsigned char *msg = new unsigned char[lens+1];
@@ -56,14 +70,14 @@ unsigned char* Msg::makemsg(int kbn, int kbe,int&lens)
 	memcpy(msg + 12, MSG_A, A_len);//msg_a 
 	memcpy(msg + 12 + A_len, kstemp, len);//ks
 	std::string ttemphs = sha512(this->pi.data());
-	memcpy(msg + 12 + A_len + len, ttemphs.c_str(), ttemphs.size());//pimd
+	memcpy(msg + 12 + A_len + len, ttemphs.c_str(), 128);//pimd
 	memcpy(msg + 12 + A_len + len + 128, this->oi.data(), this->oi.size());//oi 
-	msg[12+A_len+len+128+this->oi.size()]='\0';
+	//msg[12+A_len+len+128+this->oi.size()]='\0';
 	memcpy(msg + 12 + A_len + len + 256, this->ds, this->dslen);//DS 512
-	memcpy(msg + 12 + A_len + len + 768, this->kr.GetPublicKey(), 8);
+	memcpy((msg + 12 + A_len + len +768 ), this->kr.GetPrivateKey(), 8);
 	return msg;
 }
 Msg::~Msg()
 {
-//	delete []this->ds;
+	//delete []this->ds;
 }

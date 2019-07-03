@@ -6,11 +6,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <iostream>
 #include <cstring>
 #include <cstdio>
-#include<stdlib.h>
+#include <string>
 #include "rsa.h"
 #include "SHA512.h"
 using namespace std;
@@ -41,70 +42,45 @@ class Merchant{
 private:
 	unsigned char *encrypt_msga;
 	unsigned char *encrypt_msgb;
-	uint64_t PIMD[8];
+	// uint64_t PIMD[8];
+	char PIMD[SHORTLENGTH];
 	char OI[SHORTLENGTH];
 	int *DS;
 	int CC[2];
 	int sock_recv;
 	int sock_send;
 public:
-	int StructChecker();
 	int Receiver();
-	// int CheckMessage();
+	int CheckMessage();
 	int Loader(unsigned char *);
 	int Transformer(int, struct check_msg);
-	// int Checker(char *);
+	int Checker(char *);
 	int Sender(char *);
 };
 
 int Merchant::Transformer(int dslen, struct check_msg chk_msg){
 	char temp[SHORTLENGTH];
-	memcpy(temp, chk_msg.PIMD, 128); 
-//	cout<<"PIMD(content): "<<chk_msg.PIMD<<endl;
-//	cout<<"PIMD(length): "<<strlen(chk_msg.PIMD)<<endl;
 	memcpy(this->PIMD, chk_msg.PIMD, 128); 
-	std::cout<<"PIMD\n";
-	for(int i =0;i<8;i++)
-		std::cout<<this->PIMD[i]<<std::endl;
+	// for(int i =0;i<8;i++)
+	// 	std::cout<<this->PIMD[i]<<std::endl;
 	strcpy(this->OI, chk_msg.OI);
-	std::cout<<this->OI<<std::endl;
 	memcpy(this->DS, chk_msg.DS, dslen); 
 	memcpy(this->CC, chk_msg.CC, 8);
 	RSA rsa;
-	rsa.SetPublicKey(1823347,549);
-	rsa.SetPrivateKey(1823347,990349);
+	rsa.SetPrivateKey(this->CC[0],this->CC[1]);
 	rsa.decrypt(this->DS);
 	std::string dsstr = rsa.GetDecoded();
 	unsigned short dstemp[64];
-	std::cout<<"ds\n";
+	std::cout<<"DS"<<endl;
 	memcpy(dstemp,dsstr.data(),128);
 	for(int i =0 ;i<64;i++){
 		if((i+1)%4==0)
 		std::cout<<dstemp[i]<<"\n";
-		else
-		{
+		else{
 			std::cout<<dstemp[i]<<" ";
 		}
-		
 	}
 	std::cout<<"CC   "<<this->CC[0]<<" "<<this->CC[1]<<std::endl;
-}
-
-int Merchant::StructChecker(){
-	 
-/* 	cout<<"MSG_A: "<<this->encrypt_msga<<endl;
-	cout<<"MSG_B: "<<this->encrypt_msgb<<endl;
-	cout<<"PIMD: "<<this->PIMD<<endl;
-	cout<<"OI: "<<this->OI<<endl;
-	cout<<"DS: "<<this->DS<<endl;
-	cout<<"CC: "<<this->CC[0]<<' '<<this->CC[1]<<endl;
-	int *p = this->DS;
-   
-    while(*p != 0){
-        cout<<*p<<endl;
-        p ++;
-    }
-	*/
 }
 
 int Merchant::Loader(unsigned char *buffer){
@@ -123,55 +99,68 @@ int Merchant::Loader(unsigned char *buffer){
 	memcpy(this->encrypt_msgb, msg->buffer + msg->lena, msg->lenb);
 	memcpy(msg_p, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
 	this->Transformer(msg->lends, chk_msg);
-	this->StructChecker();
 }
 
 
 
-// int Merchant::Checker(char *buffer){
-// 	if(!CheckMessage()){
-// 		sprintf(buffer, "%s", this->encrypt_msga);
-// 	}
-// 	else{
-// 		sprintf(buffer, "%s", "counterfeit");
-// 	}
-// }
+int Merchant::Checker(char *buffer){
+	if(!CheckMessage()){
+		sprintf(buffer, "%s", this->encrypt_msga);
+	}
+	else{
+		sprintf(buffer, "%s", "counterfeit");
+	}
+}
 
-// int Merchant::CheckMessage(){
-// 	RSA rsa;
-// 	rsa.SetPublicKey(this->chk_msg->CC[0], this->chk_msg->CC[1]);
+int Merchant::CheckMessage(){
+	//get depressed DS
+	RSA rsa;
+	rsa.SetPrivateKey(this->CC[0],this->CC[1]);
+	rsa.decrypt(this->DS);
+	std::string dsstr = rsa.GetDecoded();
+	unsigned short dstemp[64];
+	memcpy(dstemp,dsstr.data(),128);
+
+	//get OIMD
+	string OI = this->OI;
+	string OIMD = sha512(OI);
 	
-// 	int *buffer;
-// 	buffer = (int *)&this->chk_msg->DS;
-// 	rsa.decrypt(buffer);
-// 	string decoded_temp = rsa.GetDecoded();
-// 	char decoded[128];
-// 	strcpy(decoded, decoded_temp.c_str());
-
-// 	SHA512 T;
-// 	hashval hashbuff;
-// 	hashbuff = T.hash(this->chk_msg->OI);
-// 	char OIMD[128];
-// 	sprintf(OIMD, "%s", hashbuff.val);
-
-// 	char POMD[128];
-// 	int len = strlen(this->chk_msg->PIMD) > strlen(OIMD) ? strlen(this->chk_msg->PIMD) : strlen(OIMD);
-// 	for(int i = 0; i< len; i++){
-// 		POMD[i] = this->chk_msg->PIMD[i] | OIMD[i];
-// 	}
-// 	hashbuff = T.hash(POMD);
-// 	memset(POMD, 0, sizeof(POMD));
-// 	sprintf(POMD, "%s", hashbuff.val);
-
-// 	if(strcmp(decoded,POMD) == 0){
-// 		cout<<"RIGHT"<<endl;
-// 		return 0;
-// 	}
-// 	else{
-// 		cout<<"WRONG"<<endl;
-// 		return -1;
-// 	}
-// }
+	//combine PIMD and POMD
+	string PIMD = this->PIMD;
+	char temp[128];
+	for (int i = 0; i < 128; i++) {
+		temp[i] = PIMD[i]|OIMD[i];
+	}
+	string POMD = sha512(temp, 128);
+	unsigned short tds[64];
+    memcpy(tds, POMD.data(), 128);
+   	
+   	cout<<"PIMD: "<<PIMD<<endl;
+    cout<<"OIMD: "<<OIMD<<endl;
+    cout<<"POMD: "<<endl;
+    for(int i = 0;i<64;i++){
+    	if((i+1)%4==0)
+			std::cout<<tds[i]<<std::endl;
+		else
+			std::cout<<tds[i]<<" ";
+    }
+    cout<<"DS"<<endl;
+    for(int i = 0;i<64;i++){
+    	if((i+1)%4==0)
+			std::cout<<dstemp[i]<<std::endl;
+		else
+			std::cout<<dstemp[i]<<" ";
+    }
+    //compare POMD and result of depressed DS
+   	int flag = 0;
+    for(int i = 0;i<64;i++){
+    	if(tds[i] != dstemp[i]){
+    		flag = -1;
+    		break;
+    	}
+    }
+    return flag;
+}
 
 int Merchant::Receiver(){
 	this->sock_recv = socket(AF_INET,SOCK_STREAM,0);
@@ -199,7 +188,7 @@ int Merchant::Receiver(){
 		socklen_t len=0;
 		int client_sock = accept(this->sock_recv, (struct sockaddr*)&socket, &len);
 		if(client_sock<0) {
-			printf("accept()\n");
+			// printf("accept()\n");
 			return 3;
 		}
 		char buf_ip[INET_ADDRSTRLEN];
@@ -216,10 +205,11 @@ int Merchant::Receiver(){
 			memset(buf,'\0',sizeof(buf));
 			std::cout<<read(client_sock,buf,sizeof(buf))<<"  read size()\n";
 			this->Loader(buf);
-			// char buf2[1024];
-			// memset(buf2, 0,sizeof(buf2));
-			// this->Checker(buf2);
-			// this->Sender(buf2);
+			char buf2[1024];
+			memset(buf2, 0,sizeof(buf2));
+			this->Checker(buf2);
+			cout<<buf2<<endl;
+			this->Sender(buf2);
 			close(fd);
 		} else if(fd>0) {
 			close(fd);

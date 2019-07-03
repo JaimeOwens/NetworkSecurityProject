@@ -21,8 +21,16 @@ int main() {
 	Msg m(ks,pi,oi,n,e,d);
 	unsigned char* temp = NULL;
 	int lens;
-	temp = m.makemsg(1823347, 549,lens);
+	temp = m.makemsg(n, d, lens);
+	std::cout<<"the whole len is "<<lens<<std::endl;
+	int a=5, b=6,c=5;
+	if (temp != NULL) {
+		memcpy(&a, temp, 4);
+		memcpy(&b, temp +4, 4);
+		memcpy(&c,temp+8,4);
+	}
 	mytcp se("127.0.0.1",8886);
 	std::cout<<se.mysend(temp,lens);
+	delete []temp;
 	return 0;
 }
