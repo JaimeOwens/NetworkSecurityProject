@@ -105,13 +105,14 @@ string EnterPersonInfo(){
 		string shop_name, item_id, number; 
 		cout<<"Enter the shop's name , item id and item number"<<endl;
 		cout<<"Enter shop's name equal to 0 to end"<<endl;
-		while(cin>>shop_name){
-			if(shop_name == "0"){
-				break;
-			}
-			cin>>item_id>>number;
-			pi += (shop_name + ' ' + item_id + ' ' + number + '\n');
-		}
+		// while(cin>>shop_name){
+		// 	if(shop_name == "0"){
+		// 		break;
+		// 	}
+		// cin>>item_id>>number;
+		// pi += (shop_name + ' ' + item_id + ' ' + number + '\n');
+		// }
+		cin>>pi;
 	}
 	else{
 		return "ERROR";
