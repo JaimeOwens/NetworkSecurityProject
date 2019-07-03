@@ -38,14 +38,22 @@ int main() {
 	memcpy(tmsg.OI,temp+12+a+b+128,128);
 	memcpy(tmsg.DS,temp+12+a+b+256,c);
 	memcpy(tmsg.CC,temp+12+a+b+768,8);
+	std::cout<<"PIMD is "<<tmsg.PIMD<<std::endl;
+	uint64_t pimdnum[8];
+	memcpy(pimdnum,tmsg.PIMD,128);
+	for(int i =0;i<8;i++)
+		std::cout<<pimdnum[i]<<std::endl;
 	std::cout<<"the OI is    "<<tmsg.OI<<std::endl;
 	std::cout<<tmsg.CC[0]<<" "<<tmsg.CC[1]<<std::endl;
 	RSA ts;
 	ts.SetPublicKey(1823347,549);
 	ts.SetPrivateKey(1823347,990349);
-	ts.decrypt(msgb);
-	std::string ksstr = ts.GetDecoded();
-	std::cout<<"ks is   "<<ksstr<<std::endl;
+
+	int * dss = new int[c/4];
+	memcpy(dss,tmsg.DS,c);
+	ts.decrypt(dss);
+	std::string dsstr = ts.GetDecoded();
+	unsigned short dsnum[64];
 	mytcp se("127.0.0.1",8886);
 	std::cout<<se.mysend(temp,lens);
 	return 0;
