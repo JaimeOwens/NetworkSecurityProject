@@ -87,8 +87,6 @@ int Merchant::Transformer(int dslen, struct check_msg chk_msg){
 		}
 		
 	}
-	for(int i =0;i<8;i++)
-		std::cout<<this->PIMD[i]<<std::endl;
 	std::cout<<"CC   "<<this->CC[0]<<" "<<this->CC[1]<<std::endl;
 }
 
