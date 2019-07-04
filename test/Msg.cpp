@@ -75,7 +75,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	RSA kb;
 	kb.SetPublicKey(kbn, kbe);
 	int* kstemp = kb.encrypt(this->ks);
-	int len = kb.GetLength(kstemp);
+	int len = kb.GetLength(kstemp)+4;
 	
 	// RC4(PI + DS + OIMD) + 4*length
 	const char *p = (const char *)(char *)MSG_A_temp;
