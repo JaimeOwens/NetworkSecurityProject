@@ -57,19 +57,17 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	// rc.rc4_setup((unsigned char *)s, (unsigned char*)this->ks, strlen(this->ks));
 	// rc.rc4_encrypt((unsigned char*)s, MSG_A, A_len);
 	
-	// PI + DS + OIMD + 3*length
-	int A_len = this->pi.size() + this->dslen + 128 + 3 * sizeof(int);
 	// PI + DS + OIMD 
 	int A_len_temp = this->pi.size() + this->dslen + 128;
 	unsigned char* MSG_A_temp = new unsigned char[A_len_temp + 1];
 	memset(MSG_A_temp, 0, A_len_temp);
 	memcpy(MSG_A_temp, this->pi.data(), this->pi.size());
-	std::string temphs = sha512(this->oi.data());
 	memcpy(MSG_A_temp + this->pi.size(), this->ds, this->dslen);
+	std::string temphs = sha512(this->oi.data());
 	memcpy(MSG_A_temp + this->pi.size() + this->dslen, temphs.data(), 128);
+	MSG_A_temp[A_len_temp] = '\0';
 	
 	rc4 rc;
-	MSG_A_temp[A_len_temp] = '\0';
 	char s[512] = { 0 };
 	rc.rc4_setup((unsigned char *)s, (unsigned char*)this->ks, strlen(this->ks));
 	rc.rc4_encrypt((unsigned char*)s, MSG_A_temp, A_len_temp);
@@ -79,16 +77,23 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	int* kstemp = kb.encrypt(this->ks);
 	int len = kb.GetLength(kstemp);
 	
+	// RC4(PI + DS + OIMD) + 4*length
+	const char *p = (const char *)(char *)MSG_A_temp;
+	int RC4_len = strlen(p);
+	int A_len = RC4_len + 4 * sizeof(int);
 	int PIlen = this->pi.size();
 	unsigned char* MSG_A = new unsigned char[A_len + 1];
 	memset(MSG_A, 0, A_len);
-	memcpy(MSG_A, &PIlen, 4);
-	memcpy(MSG_A + 4, &(this->dslen), 4);
-	memcpy(MSG_A + 8, &len, 4);
-	memcpy(MSG_A + 12, MSG_A_temp, A_len_temp);
+	memcpy(MSG_A, &RC4_len, 4);
+	memcpy(MSG_A + 4, &PIlen, 4);
+	memcpy(MSG_A + 8, &(this->dslen), 4);
+	memcpy(MSG_A + 12, &len, 4);
+	memcpy(MSG_A + 16, MSG_A_temp, RC4_len);
+	MSG_A[A_len] = '\0';
 
-	lens = 12+len+A_len+768+8;
-	unsigned char *msg = new unsigned char[lens+1];
+	//3*length + A + B + (PIMD+OI+DS) + CC;
+	lens = 12 + A_len + len + 768 + 8;
+	unsigned char *msg = new unsigned char[lens + 1];
 	msg[lens] = '\0';
 
 	memset(msg, 0, lens);
@@ -102,7 +107,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	memcpy(msg + 12 + A_len + len + 128, this->oi.data(), this->oi.size());//oi 
 	//msg[12+A_len+len+128+this->oi.size()]='\0';
 	memcpy(msg + 12 + A_len + len + 256, this->ds, this->dslen);//DS 512
-	memcpy((msg + 12 + A_len + len +768 ), this->kr.GetPrivateKey(), 8);
+	memcpy((msg + 12 + A_len + len + 768 ), this->kr.GetPrivateKey(), 8);
 	return msg;
 }
 
