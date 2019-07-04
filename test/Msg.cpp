@@ -3,7 +3,7 @@ Msg::Msg()
 {
 
 }
-Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
+Msg::Msg(std::string ks,std::string pi, std::string oi,int kmn, int kme, int kmd)
 {
 	this->pi = pi;
 	this->oi = oi;
@@ -32,8 +32,8 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 			}
 			
 		}
-	this->kr.SetPublicKey(n, d);
-	this->kr.SetPrivateKey(n, e);
+	this->kr.SetPublicKey(kmn, kmd);
+	this->kr.SetPrivateKey(kmn, kme);
 	this->ds = this->kr.encrypt((char*)tds);
 	this->dslen = this->kr.GetLength(this->ds);
 	//this->ds = new int[this->dslen/4];
@@ -42,24 +42,50 @@ Msg::Msg(std::string ks,std::string pi, std::string oi,int n,int e,int d)
 
 unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 {
-	int A_len = this->pi.size() + 64 + this->dslen;
-	unsigned char* MSG_A = new unsigned char[this->pi.size() + 64 +this->dslen + 1];
+	// int A_len = this->pi.size() + 64 + this->dslen;
+	// unsigned char* MSG_A = new unsigned char[this->pi.size() + 64 +this->dslen + 1];
 	
-	memset(MSG_A, 0, A_len);
-	memcpy(MSG_A, this->pi.data(), this->pi.size());
-	memcpy(MSG_A + this->pi.size(), this->ds, this->dslen);
+	// memset(MSG_A, 0, A_len);
+	// memcpy(MSG_A, this->pi.data(), this->pi.size());
+	// memcpy(MSG_A + this->pi.size(), this->ds, this->dslen);
 	
+	// std::string temphs = sha512(this->oi.data());
+	// memcpy(MSG_A + this->pi.size() + this->dslen, temphs.data(), 64);
+	// rc4 rc;
+	// MSG_A[A_len] = '\0';
+	// char s[256] = { 0 };
+	// rc.rc4_setup((unsigned char *)s, (unsigned char*)this->ks, strlen(this->ks));
+	// rc.rc4_encrypt((unsigned char*)s, MSG_A, A_len);
+	
+	// PI + DS + OIMD + 3*length
+	int A_len = this->pi.size() + this->dslen + 128 + 3 * sizeof(int);
+	// PI + DS + OIMD 
+	int A_len_temp = this->pi.size() + this->dslen + 128;
+	unsigned char* MSG_A_temp = new unsigned char[A_len_temp + 1];
+	memset(MSG_A_temp, 0, A_len);
+	memcpy(MSG_A_temp, this->pi.data(), this->pi.size());
 	std::string temphs = sha512(this->oi.data());
-	memcpy(MSG_A + this->pi.size() + this->dslen, temphs.data(), 64);
+	memcpy(MSG_A_temp + this->pi.size(), this->ds, this->dslen);
+	memcpy(MSG_A_temp + this->pi.size() + this->dslen, temphs.data(), 128);
 	rc4 rc;
-	MSG_A[A_len] = '\0';
-	char s[256] = { 0 };
+	MSG_A_temp[A_len_temp] = '\0';
+	char s[512] = { 0 };
 	rc.rc4_setup((unsigned char *)s, (unsigned char*)this->ks, strlen(this->ks));
-	rc.rc4_encrypt((unsigned char*)s, MSG_A, A_len);
+	rc.rc4_encrypt((unsigned char*)s, MSG_A_temp, A_len_temp);
+	
 	RSA kb;
 	kb.SetPublicKey(kbn, kbe);
 	int* kstemp = kb.encrypt(this->ks);
 	int len = kb.GetLength(kstemp);
+
+	int PIlen = this->pi.size();
+	unsigned char* MSG_A = new unsigned char[A_len + 1];
+	memset(MSG_A, 0, A_len);
+	memcpy(MSG_A, &PIlen, 4);
+	memcpy(MSG_A + 4, &(this->dslen), 4);
+	memcpy(MSG_A + 8, &len, 4);
+	memcpy(MSG_A + 12, MSG_A_temp, A_len_temp);
+
 	lens = 12+len+A_len+768+8;
 	unsigned char *msg = new unsigned char[lens+1];
 	msg[lens] = '\0';
@@ -77,6 +103,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	memcpy((msg + 12 + A_len + len +768 ), this->kr.GetPrivateKey(), 8);
 	return msg;
 }
+
 Msg::~Msg()
 {
 	//delete []this->ds;

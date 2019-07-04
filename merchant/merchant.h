@@ -24,8 +24,8 @@ using namespace std;
 #define _SENDPORT_ 8888
 #define _BACKLOG_ 10
 
-struct check_msg{
-	char PIMD[128];
+struct Recv_msg{
+	char PIMD[SHORTLENGTH];
 	char OI[SHORTLENGTH];
 	char DS[LONGLENGTH];
 	int CC[2];
@@ -53,19 +53,19 @@ public:
 	int Receiver();
 	int CheckMessage();
 	int Loader(unsigned char *);
-	int Transformer(int, struct check_msg);
-	int Checker(char *);
+	int Transformer(int, struct Recv_msg);
+	int Checker(int, char *);
 	int Sender(char *);
 };
 
-int Merchant::Transformer(int dslen, struct check_msg chk_msg){
+int Merchant::Transformer(int dslen, struct Recv_msg recv_msg){
 	char temp[SHORTLENGTH];
-	memcpy(this->PIMD, chk_msg.PIMD, 128); 
+	memcpy(this->PIMD, recv_msg.PIMD, 128); 
 	// for(int i =0;i<8;i++)
 	// 	std::cout<<this->PIMD[i]<<std::endl;
-	strcpy(this->OI, chk_msg.OI);
-	memcpy(this->DS, chk_msg.DS, dslen); 
-	memcpy(this->CC, chk_msg.CC, 8);
+	strcpy(this->OI, recv_msg.OI);
+	memcpy(this->DS, recv_msg.DS, dslen); 
+	memcpy(this->CC, recv_msg.CC, 8);
 	RSA rsa;
 	rsa.SetPrivateKey(this->CC[0],this->CC[1]);
 	rsa.decrypt(this->DS);
@@ -84,8 +84,8 @@ int Merchant::Transformer(int dslen, struct check_msg chk_msg){
 }
 
 int Merchant::Loader(unsigned char *buffer){
-	check_msg chk_msg;
-	check_msg *msg_p = &chk_msg;
+	Recv_msg recv_msg;
+	Recv_msg *msg_p = &recv_msg;
 	all_msg *msg = (struct all_msg *)buffer;
 	std::cout<<&buffer<<std::endl;
 	cout<<msg->lena<<' '<<msg->lenb<<' '<<msg->lends<<endl;
@@ -97,15 +97,17 @@ int Merchant::Loader(unsigned char *buffer){
 	std::cout<<&msg->buffer<<std::endl;
 	std::cout<<msg->lena<<" lena "<<msg->lenb<<" lenb\n";
 	memcpy(this->encrypt_msgb, msg->buffer + msg->lena, msg->lenb);
-	memcpy(msg_p, msg->buffer + msg->lena + msg->lenb, sizeof(check_msg));
-	this->Transformer(msg->lends, chk_msg);
+	memcpy(msg_p, msg->buffer + msg->lena + msg->lenb, sizeof(Recv_msg));
+	this->Transformer(msg->lends, recv_msg);
+	return msg->lena;
 }
 
 
 
-int Merchant::Checker(char *buffer){
+int Merchant::Checker(int lena, char *buffer){
 	if(!CheckMessage()){
 		sprintf(buffer, "%s", this->encrypt_msga);
+		memcpy(buffer + lena, this->CC, 8);
 	}
 	else{
 		sprintf(buffer, "%s", "counterfeit");
@@ -204,10 +206,10 @@ int Merchant::Receiver(){
 			unsigned char buf[2048];
 			memset(buf,'\0',sizeof(buf));
 			std::cout<<read(client_sock,buf,sizeof(buf))<<"  read size()\n";
-			this->Loader(buf);
+			int lena = this->Loader(buf);
 			char buf2[1024];
 			memset(buf2, 0,sizeof(buf2));
-			this->Checker(buf2);
+			this->Checker(lena, buf2);
 			cout<<buf2<<endl;
 			this->Sender(buf2);
 			close(fd);

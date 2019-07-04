@@ -16,12 +16,13 @@ struct check_msg{
 int main() {
 	check_msg tmsg;
 	std::string ks, oi, pi;
-	int n, e, d;
-	std::cin >> ks >> oi >> pi >> n >> e >> d;
-	Msg m(ks,pi,oi,n,e,d);
+	int kmn, kme, kmd;
+	int kbn, kbe, kbd;
+	std::cin >> ks >> oi >> pi >> kmn >> kme >> kmd >> kbn >> kbe >> kbd;
+	Msg m(ks,pi,oi,kmn,kme,kmd);
 	unsigned char* temp = NULL;
 	int lens;
-	temp = m.makemsg(n, d, lens);
+	temp = m.makemsg(kbn, kbe, lens);
 	std::cout<<"the whole len is "<<lens<<std::endl;
 	int a=5, b=6,c=5;
 	if (temp != NULL) {
