@@ -24,12 +24,12 @@ int main() {
 	int lens;
 	temp = m.makemsg(kbn, kbe, lens);
 	std::cout<<"the whole len is "<<lens<<std::endl;
-	int a=5, b=6,c=5;
-	if (temp != NULL) {
-		memcpy(&a, temp, 4);
-		memcpy(&b, temp +4, 4);
-		memcpy(&c,temp+8,4);
-	}
+	// int a=5, b=6,c=5;
+	// if (temp != NULL) {
+	// 	memcpy(&a, temp, 4);
+	// 	memcpy(&b, temp +4, 4);
+	// 	memcpy(&c,temp+8,4);
+	// }
 	mytcp se("127.0.0.1",8886);
 	std::cout<<se.mysend(temp,lens);
 	delete []temp;

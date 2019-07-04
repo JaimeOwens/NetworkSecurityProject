@@ -62,22 +62,23 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	// PI + DS + OIMD 
 	int A_len_temp = this->pi.size() + this->dslen + 128;
 	unsigned char* MSG_A_temp = new unsigned char[A_len_temp + 1];
-	memset(MSG_A_temp, 0, A_len);
+	memset(MSG_A_temp, 0, A_len_temp);
 	memcpy(MSG_A_temp, this->pi.data(), this->pi.size());
 	std::string temphs = sha512(this->oi.data());
 	memcpy(MSG_A_temp + this->pi.size(), this->ds, this->dslen);
 	memcpy(MSG_A_temp + this->pi.size() + this->dslen, temphs.data(), 128);
+	
 	rc4 rc;
 	MSG_A_temp[A_len_temp] = '\0';
 	char s[512] = { 0 };
 	rc.rc4_setup((unsigned char *)s, (unsigned char*)this->ks, strlen(this->ks));
 	rc.rc4_encrypt((unsigned char*)s, MSG_A_temp, A_len_temp);
-	
+
 	RSA kb;
 	kb.SetPublicKey(kbn, kbe);
 	int* kstemp = kb.encrypt(this->ks);
 	int len = kb.GetLength(kstemp);
-
+	
 	int PIlen = this->pi.size();
 	unsigned char* MSG_A = new unsigned char[A_len + 1];
 	memset(MSG_A, 0, A_len);
@@ -89,6 +90,7 @@ unsigned char* Msg::makemsg(int kbn, int kbe, int&lens)
 	lens = 12+len+A_len+768+8;
 	unsigned char *msg = new unsigned char[lens+1];
 	msg[lens] = '\0';
+
 	memset(msg, 0, lens);
 	memcpy(msg, &A_len, 4);//len a
 	memcpy(msg + 4, &len, 4);//len b
